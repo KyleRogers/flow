@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vaadin.flow.function.DeploymentConfiguration;
+import com.vaadin.flow.internal.UsageStatistics;
 import com.vaadin.flow.server.communication.FaviconHandler;
 import com.vaadin.flow.server.communication.PushRequestHandler;
 import com.vaadin.flow.server.frontend.FallbackChunk;
@@ -82,7 +83,6 @@ public class VaadinServletService extends VaadinService {
             throws ServiceException {
         List<RequestHandler> handlers = super.createRequestHandlers();
         handlers.add(0, new FaviconHandler());
-        handlers.add(0, new BootstrapHandler());
         if (isAtmosphereAvailable()) {
             try {
                 handlers.add(new PushRequestHandler(this));
@@ -95,6 +95,13 @@ public class VaadinServletService extends VaadinService {
                         e);
             }
         }
+        if (getDeploymentConfiguration().enableDevServer()) {
+            DevModeHandler handler = DevModeHandler.getDevModeHandler();
+            if (handler != null) {
+                handlers.add(0, handler);
+            }
+        }
+        handlers.add(0, new BootstrapHandler());
         return handlers;
     }
 

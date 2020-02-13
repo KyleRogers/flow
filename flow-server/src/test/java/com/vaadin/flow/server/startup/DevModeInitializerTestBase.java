@@ -3,6 +3,8 @@ package com.vaadin.flow.server.startup;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
@@ -146,6 +149,16 @@ public class DevModeInitializerTestBase {
 
     public void runOnStartup() throws Exception {
         devModeInitializer.onStartup(classes, servletContext);
+        waitForDevModeServer();
+    }
+
+    protected void waitForDevModeServer() throws NoSuchMethodException,
+            IllegalAccessException, InvocationTargetException {
+        DevModeHandler handler = DevModeHandler.getDevModeHandler();
+        Assert.assertNotNull(handler);
+        Method join = DevModeHandler.class.getDeclaredMethod("join");
+        join.setAccessible(true);
+        join.invoke(handler);
     }
 
     public void runDestroy() throws Exception {

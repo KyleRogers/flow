@@ -83,6 +83,8 @@ public class NodeUpdateTestUtil {
             FileUtils.writeStringToFile(npmCli,
                     "process.argv[2] == '--version' && console.log('5.6.0');",
                     StandardCharsets.UTF_8);
+
+            new File(baseDir, "node_modules/.modules.yaml").createNewFile();
         }
         if (stubNode) {
             File node = new File(baseDir,
